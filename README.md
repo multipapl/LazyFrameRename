@@ -19,5 +19,5 @@
 
 ## Requirements
 
-- Python 3 (preinstalled on most systems)
+- Python 3
 - No external libraries neede
