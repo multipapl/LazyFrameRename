@@ -53,6 +53,8 @@ def rename_files():
         logging.info(f"Processing folder: {folder}")
         files_renamed_in_folder = 0
         files = sorted(f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f)))
+
+        counter = 1  # Start counter at 1 for each folder
         for fname in files:
             name, ext = os.path.splitext(fname)
             if len(name) < digits_to_trim:
@@ -60,26 +62,20 @@ def rename_files():
                 continue
 
             base = name[:-digits_to_trim]
-            counter = 1
+            new_name = f"{base}.{str(counter).zfill(4)}{ext}"
+            dst = os.path.join(folder, new_name)
             src = os.path.join(folder, fname)
-            while True:
-                new_name = f"{base}.{str(counter).zfill(4)}{ext}"
-                dst = os.path.join(folder, new_name)
-                if not os.path.exists(dst):
-                    try:
-                        os.rename(src, dst)
-                        total_renamed += 1
-                        files_renamed_in_folder += 1
-                        logging.debug(f"Renamed {fname} to {new_name}")
-                    except OSError as e:
-                        messagebox.showerror("Error", f"Could not rename {fname}: {e}")
-                        logging.error(f"Could not rename {fname}: {e}")
-                    break
-                counter += 1
-                if counter > 9999:
-                    logging.error(f"Too many files with similar names in {folder}. Skipping {fname}")
-                    messagebox.showerror("Error", f"Too many files with similar names. Skipping {fname}")
-                    break
+
+            try:
+                os.rename(src, dst)
+                total_renamed += 1
+                files_renamed_in_folder += 1
+                logging.debug(f"Renamed {fname} to {new_name}")
+            except OSError as e:
+                messagebox.showerror("Error", f"Could not rename {fname}: {e}")
+                logging.error(f"Could not rename {fname}: {e}")
+                break  # Stop processing if a rename fails
+            counter += 1  # Increment counter for the next file
         logging.info(f"Renamed {files_renamed_in_folder} file(s) in folder: {folder}")
 
     messagebox.showinfo("Done", f"Renamed {total_renamed} file(s).")
